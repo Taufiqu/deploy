@@ -1,0 +1,70 @@
+# =========================================================================
+# DOCKER COMPOSE FOR LOCAL DEVELOPMENT
+# =========================================================================
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: proyek_pajak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Faktur Service (Tesseract OCR)
+  faktur-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.faktur
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/proyek_pajak
+      - FLASK_ENV=development
+      - FLASK_DEBUG=true
+      - PORT=5001
+      - POPPLER_PATH=/usr/bin
+      - SECRET_KEY=dev-secret-key
+      - SERVICE_NAME=faktur-ocr
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+
+  # Bukti Setor Service (EasyOCR)
+  bukti-setor-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.bukti-setor
+    ports:
+      - "5002:5002"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/proyek_pajak
+      - FLASK_ENV=development
+      - FLASK_DEBUG=true
+      - PORT=5002
+      - POPPLER_PATH=/usr/bin
+      - SECRET_KEY=dev-secret-key
+      - SERVICE_NAME=bukti-setor-ocr
+      - EASYOCR_MODULE_PATH=/home/appuser/.EasyOCR
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

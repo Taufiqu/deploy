@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+uploads/
+debug/
+
+# Node/React
+package.json
+package-lock.json
+node_modules/
+frontend/
+# Build artifacts
+dist/

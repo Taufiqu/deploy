@@ -1,0 +1,40 @@
+# ========================================
+# RAILWAY ENVIRONMENT VARIABLES - BUKTI SETOR SERVICE
+# Copy these values to Railway dashboard when deploying
+# ========================================
+
+# Database Configuration (Supabase) - SAME as Faktur Service
+DATABASE_URL=postgresql://postgres.hodllrhwyqhrksfkgiqc:26122004dbpajak@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=https://hodllrhwyqhrksfkgiqc.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZGxscmh3eXFocmtzZmtnaXFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNjY3NjQyMCwiZXhwIjoyMDUyMjUyNDIwfQ.lAOT5VnU8Kev-aOSDnpG6_Sojsg_SU8-TS1y0YE57Zw
+
+# Flask Application Configuration
+FLASK_ENV=production
+FLASK_APP=app_bukti_setor.py
+FLASK_DEBUG=false
+SECRET_KEY=bukti-setor-production-secret-key-very-secure-32-chars-minimum
+
+# Railway Configuration
+PORT=5002
+SERVICE_NAME=bukti-setor-ocr-service
+
+# OCR Configuration (EasyOCR)
+POPPLER_PATH=/usr/bin
+OCR_TIMEOUT=60
+OCR_MAX_RETRIES=3
+EASYOCR_MODULE_PATH=/home/appuser/.EasyOCR
+
+# File Upload Settings
+MAX_CONTENT_LENGTH=16777216
+
+# Logging
+LOG_LEVEL=INFO
+
+# ========================================
+# RAILWAY DEPLOYMENT SETTINGS:
+# ========================================
+# Root Directory: bukti-setor-service
+# Build Command: (auto-detected from Dockerfile.bukti-setor)
+# Start Command: (auto-detected from Dockerfile.bukti-setor)  
+# Port: 5002
+# IMPORTANT: This service takes 10-15 minutes to deploy (EasyOCR models download)

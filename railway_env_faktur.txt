@@ -1,0 +1,38 @@
+# ========================================
+# RAILWAY ENVIRONMENT VARIABLES - FAKTUR SERVICE
+# Copy these values to Railway dashboard when deploying
+# ========================================
+
+# Database Configuration (Supabase)
+DATABASE_URL=postgresql://postgres.hodllrhwyqhrksfkgiqc:26122004dbpajak@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=https://hodllrhwyqhrksfkgiqc.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZGxscmh3eXFocmtzZmtnaXFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNjY3NjQyMCwiZXhwIjoyMDUyMjUyNDIwfQ.lAOT5VnU8Kev-aOSDnpG6_Sojsg_SU8-TS1y0YE57Zw
+
+# Flask Application Configuration
+FLASK_ENV=production
+FLASK_APP=app_faktur.py
+FLASK_DEBUG=false
+SECRET_KEY=faktur-production-secret-key-very-secure-32-chars-minimum
+
+# Railway Configuration
+PORT=5001
+SERVICE_NAME=faktur-ocr-service
+
+# OCR Configuration (Tesseract)
+POPPLER_PATH=/usr/bin
+OCR_TIMEOUT=30
+OCR_MAX_RETRIES=3
+
+# File Upload Settings
+MAX_CONTENT_LENGTH=16777216
+
+# Logging
+LOG_LEVEL=INFO
+
+# ========================================
+# RAILWAY DEPLOYMENT SETTINGS:
+# ========================================
+# Root Directory: faktur-service
+# Build Command: (auto-detected from Dockerfile.faktur)
+# Start Command: (auto-detected from Dockerfile.faktur)  
+# Port: 5001

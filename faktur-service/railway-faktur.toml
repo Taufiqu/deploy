@@ -1,0 +1,20 @@
+# =========================================================================
+# RAILWAY CONFIGURATION FOR FAKTUR SERVICE
+# =========================================================================
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.faktur"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[env]
+FLASK_ENV = "production"
+FLASK_DEBUG = "false"
+PORT = "5001"
+POPPLER_PATH = "/usr/bin"
+SERVICE_NAME = "faktur-ocr"

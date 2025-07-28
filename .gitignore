@@ -1,0 +1,509 @@
+# ========================================
+# GITIGNORE FOR OCR SEPARATED SERVICES
+# ========================================
+
+# ========================================
+# ENVIRONMENT & SECRETS
+# ========================================
+.env
+.env.local
+.env.production
+.env.staging
+.env.test
+.env.development
+*.env
+.env.*
+
+# Specific environment files
+railway_env_*.txt
+supabase_credentials.txt
+supabase_credentials_actual.txt
+credentials_actual.*
+
+# Files containing real credentials (DO NOT COMMIT)
+*_real*.py
+*_supabase*.py
+verify_supabase.py
+test_real_connection.py
+test_supabase_real.py
+
+# Files with actual credentials
+FINAL_DEPLOYMENT_GUIDE.md
+DEPLOYMENT_CHECKLIST.md
+RAILWAY_DEPLOYMENT_GUIDE.md
+
+# ========================================
+# PYTHON
+# ========================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ========================================
+# OCR & ML MODELS
+# ========================================
+# EasyOCR models
+.EasyOCR/
+*.pkl
+*.model
+*.weights
+
+# Tesseract training data
+*.traineddata
+
+# ML model files
+*.h5
+*.hdf5
+*.pb
+*.onnx
+
+# ========================================
+# FILE UPLOADS & PROCESSING
+# ========================================
+uploads/
+temp/
+tmp/
+cache/
+processed/
+output/
+
+# Specific upload patterns
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.webp
+
+# Preview files
+preview_*
+debug_*
+
+# Except sample files (if any)
+!sample_*
+!test_*
+!example_*
+
+# ========================================
+# LOGS & DEBUG FILES
+# ========================================
+*.log
+logs/
+debug.log
+error.log
+access.log
+app.log
+
+# Debug files
+debug_*.json
+debug_*.txt
+*.debug
+
+# ========================================
+# DATABASE
+# ========================================
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Database dumps
+*.sql
+*.dump
+
+# Migration files (if using Alembic locally)
+# Uncomment if you want to ignore local migrations
+# migrations/versions/*.py
+
+# ========================================
+# DOCKER
+# ========================================
+# Docker volumes
+docker-data/
+.docker/
+
+# Docker compose overrides
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ========================================
+# NODE.JS (if using frontend)
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# ========================================
+# EDITOR & IDE
+# ========================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ========================================
+# OPERATING SYSTEM
+# ========================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================================
+# CLOUD & DEPLOYMENT
+# ========================================
+# Railway
+.railway/
+
+# Heroku
+.heroku/
+
+# Vercel
+.vercel
+
+# Netlify
+.netlify/
+
+# AWS
+.aws/
+
+# Google Cloud
+.gcloud/
+
+# ========================================
+# TESTING & DEVELOPMENT
+# ========================================
+# Test outputs
+test_output/
+test_results/
+screenshots/
+
+# Development files
+dev_*
+development_*
+local_*
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+
+# ========================================
+# SPECIFIC TO THIS PROJECT
+# ========================================
+# Legacy files (can be removed after cleanup)
+New folder/
+
+# Archive folders
+archive/
+old/
+deprecated/
+
+# Local configuration
+config.local.py
+settings.local.py
+
+# Excel exports (temporary)
+*.xlsx
+*.xls
+exports/
+
+# OCR debug outputs
+ocr_debug/
+ocr_output/
+
+# ========================================
+# SECURITY
+# ========================================
+# API keys and secrets
+*.key
+*.pem
+*.crt
+*.cert
+secrets.json
+credentials.json
+
+# SSH keys
+id_rsa
+id_rsa.pub
+known_hosts
+
+# ========================================
+# MISC
+# ========================================
+*.tmp
+*.temp
+.DS_Store?
+Icon?
+.Spotlight-V100
+.Trashes
+
+# Compressed files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and runtime files
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity

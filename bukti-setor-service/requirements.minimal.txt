@@ -1,5 +1,5 @@
 # ========================================
-# MINIMAL REQUIREMENTS FOR FAKTUR SERVICE 
+# MINIMAL REQUIREMENTS FOR BUKTI SETOR SERVICE
 # ========================================
 
 # Core Flask dependencies only
@@ -8,7 +8,7 @@ Flask-Cors==4.0.0
 Flask-SQLAlchemy==3.1.1
 gunicorn==20.1.0
 
-# Environment 
+# Environment
 python-dotenv==1.0.1
 
 # Database
@@ -16,7 +16,9 @@ psycopg2-binary==2.9.7
 
 # Basic image processing (minimal)
 Pillow==10.0.0
-pytesseract==0.3.10
 
 # Data processing (minimal)
 openpyxl==3.1.2
+
+# Simple OCR alternative (lighter than EasyOCR)
+pytesseract==0.3.10

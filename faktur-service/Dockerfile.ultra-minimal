@@ -1,0 +1,43 @@
+# =========================================================================
+# ULTRA MINIMAL DOCKERFILE - BARE BONES VERSION
+# =========================================================================
+FROM python:3.11-slim
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_ENV=production
+
+# Install ONLY essential system deps
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Working directory
+WORKDIR /app
+
+# Copy requirements and install step by step
+COPY requirements.txt .
+
+# Install Python packages one by one for better error tracking
+RUN pip install --upgrade pip
+RUN pip install Flask==2.3.3
+RUN pip install Flask-Cors==4.0.0  
+RUN pip install Flask-SQLAlchemy==3.1.1
+RUN pip install gunicorn==20.1.0
+RUN pip install python-dotenv==1.0.1
+RUN pip install psycopg2-binary==2.9.7
+
+# Copy app
+COPY . .
+
+# Create uploads
+RUN mkdir -p uploads
+
+# Test app can import
+RUN python -c "from app_faktur import app; print('✅ App import OK')"
+
+# Expose port
+EXPOSE 5001
+
+# Simple startup
+CMD ["python", "-c", "from app_faktur import app; app.run(host='0.0.0.0', port=5001, debug=False)"]

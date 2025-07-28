@@ -8,12 +8,11 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Copy minimal requirements  
-COPY requirements.ultra-minimal.txt requirements.txt
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy minimal app
 COPY app_minimal.py .
 
-EXPOSE 5001
-
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "app_minimal:app"]
+# Railway dynamic port binding
+CMD gunicorn --bind 0.0.0.0:$PORT app_minimal:app

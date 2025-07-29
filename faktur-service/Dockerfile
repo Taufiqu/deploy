@@ -1,22 +1,26 @@
 # =========================================================================
-# FAKTUR SERVICE - PRODUCTION VERSION
+# FAKTUR SERVICE - PRODUCTION VERSION (OPTIMIZED)
 # =========================================================================
 FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install minimal system dependencies in one step
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    g++ \
+    libc6-dev \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    && rm -rf ~/.cache/pip
 
 # Copy application files
 COPY app.py .

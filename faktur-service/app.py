@@ -54,6 +54,10 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-secret-key')
 if DATABASE_AVAILABLE:
     database_url = os.getenv('DATABASE_URL')
     if database_url:
+        # Debug: log connection string format (without password)
+        debug_url = database_url.split('@')[0].split(':')[:-1] + ['****@'] + database_url.split('@')[1:]
+        logger.info(f"🔌 Connecting to: {''.join(debug_url) if len(debug_url) > 1 else 'Invalid URL format'}")
+        
         # Convert postgresql:// to postgresql+pg8000:// for pg8000 driver
         if database_url.startswith('postgresql://'):
             database_url = database_url.replace('postgresql://', 'postgresql+pg8000://')

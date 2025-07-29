@@ -10,8 +10,12 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv('.env.local')
+# Load environment variables (optional file)
+try:
+    load_dotenv('.env.local')
+except:
+    # File not found, which is OK for production
+    pass
 
 # Configure logging
 logging.basicConfig(
@@ -50,6 +54,10 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-secret-key')
 if DATABASE_AVAILABLE:
     database_url = os.getenv('DATABASE_URL')
     if database_url:
+        # Convert postgresql:// to postgresql+pg8000:// for pg8000 driver
+        if database_url.startswith('postgresql://'):
+            database_url = database_url.replace('postgresql://', 'postgresql+pg8000://')
+        
         app.config['SQLALCHEMY_DATABASE_URI'] = database_url
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {

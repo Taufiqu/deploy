@@ -1,0 +1,14 @@
+# Docker ignore files
+.env.local
+.env.example
+.env.railway
+Dockerfile.backup
+*.pyc
+__pycache__/
+.git/
+.gitignore
+README.md
+*.md
+uploads/*
+debug/
+.vscode/

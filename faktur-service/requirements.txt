@@ -1,8 +1,7 @@
-# PRODUCTION RAILWAY DEPLOYMENT - MINIMAL
+# PRODUCTION RAILWAY DEPLOYMENT - PURE PYTHON
 Flask==3.0.0
-Flask-SQLAlchemy==3.1.1
+Flask-SQLAlchemy==3.1.1  
 Flask-CORS==4.0.0
-psycopg2==2.9.7
+pg8000==1.30.3
 python-dotenv==1.0.0
 gunicorn==21.2.0
-requests==2.31.0

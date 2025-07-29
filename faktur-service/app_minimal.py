@@ -1,5 +1,5 @@
 # ========================================
-# MINIMAL FLASK APP WITH CORS & API ENDPOINTS
+# FAKTUR SERVICE - WITH DATABASE & CORS & API ENDPOINTS
 # ========================================
 
 import os
@@ -7,8 +7,9 @@ import sys
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from models import db, PPNMasukan
 
-print("🚀 STARTING MINIMAL FLASK APP WITH CORS...")
+print("🚀 STARTING FAKTUR SERVICE WITH DATABASE & CORS...")
 print(f"📊 Python version: {sys.version}")
 print(f"📊 PORT environment: {os.environ.get('PORT', 'NOT SET')}")
 
@@ -25,7 +26,26 @@ CORS(app,
 # Basic config
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'test-secret-key')
 
-print("✅ Flask app with CORS created successfully")
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+}
+
+# Initialize database
+db.init_app(app)
+
+# Create tables
+with app.app_context():
+    try:
+        db.create_all()
+        print("✅ Database tables created successfully")
+    except Exception as e:
+        print(f"❌ Database error: {e}")
+
+print("✅ Flask app with CORS and Database created successfully")
 
 @app.route('/', methods=['GET'])
 def home():
@@ -94,34 +114,106 @@ def process_invoice():
             "message": f"Processing failed: {str(e)}"
         }), 500
 
+# DATABASE CRUD ENDPOINTS
+@app.route('/api/save-faktur', methods=['POST'])
+def save_faktur():
+    """Save processed faktur data to database"""
+    try:
+        data = request.get_json()
+        print(f"📝 Saving faktur data: {data}")
+        
+        # Support bulk save
+        if isinstance(data, list):
+            saved_count = 0
+            for item in data:
+                if all(key in item for key in ['jenis', 'no_faktur', 'tanggal', 'nama_lawan_transaksi', 'dpp', 'ppn']):
+                    tanggal_obj = datetime.strptime(item['tanggal'], '%Y-%m-%d').date()
+                    
+                    new_record = PPNMasukan(
+                        jenis=item['jenis'],
+                        no_faktur=item['no_faktur'],
+                        tanggal=tanggal_obj,
+                        nama_lawan_transaksi=item['nama_lawan_transaksi'],
+                        dpp=float(item['dpp']),
+                        ppn=float(item['ppn'])
+                    )
+                    db.session.add(new_record)
+                    saved_count += 1
+            
+            db.session.commit()
+            return jsonify(message=f"{saved_count} faktur berhasil disimpan!"), 201
+        
+        # Single record save
+        else:
+            if not all(key in data for key in ['jenis', 'no_faktur', 'tanggal', 'nama_lawan_transaksi', 'dpp', 'ppn']):
+                return jsonify(error="Field tidak lengkap"), 400
+            
+            tanggal_obj = datetime.strptime(data['tanggal'], '%Y-%m-%d').date()
+            
+            new_record = PPNMasukan(
+                jenis=data['jenis'],
+                no_faktur=data['no_faktur'],
+                tanggal=tanggal_obj,
+                nama_lawan_transaksi=data['nama_lawan_transaksi'],
+                dpp=float(data['dpp']),
+                ppn=float(data['ppn'])
+            )
+            
+            db.session.add(new_record)
+            db.session.commit()
+            return jsonify(message="Faktur berhasil disimpan!"), 201
+            
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error saving faktur: {e}")
+        return jsonify(error=f"Error saving faktur: {str(e)}"), 500
+
+@app.route('/api/faktur-history', methods=['GET'])
+def get_faktur_history():
+    """Get all faktur records"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 50, type=int)
+        
+        print(f"📋 Fetching faktur history - Page: {page}, Per page: {per_page}")
+        
+        results = db.session.execute(
+            db.select(PPNMasukan)
+            .order_by(PPNMasukan.tanggal.desc())
+            .limit(per_page)
+            .offset((page - 1) * per_page)
+        ).scalars().all()
+        
+        data = [record.to_dict() for record in results]
+        return jsonify(message="Data berhasil diambil.", data=data, total=len(data)), 200
+        
+    except Exception as e:
+        print(f"❌ Error fetching faktur history: {e}")
+        return jsonify(error=f"Error fetching data: {str(e)}"), 500
+
+@app.route('/api/faktur/<int:id>', methods=['DELETE'])
+def delete_faktur(id):
+    """Delete faktur record by ID"""
+    try:
+        print(f"🗑️ Deleting faktur ID: {id}")
+        
+        record = db.session.get(PPNMasukan, id)
+        if not record:
+            return jsonify(error="Data tidak ditemukan"), 404
+        
+        db.session.delete(record)
+        db.session.commit()
+        return jsonify(message="Data berhasil dihapus"), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error deleting faktur: {e}")
+        return jsonify(error=f"Error deleting data: {str(e)}"), 500
+
 @app.route('/api/history', methods=['GET'])
 def get_history():
-    print("📋 History endpoint called")
-    return jsonify({
-        "status": "success",
-        "message": "History endpoint working (database disabled in minimal mode)",
-        "data": {
-            "invoices": [
-                {
-                    "id": 1,
-                    "filename": "sample1.pdf",
-                    "processed_at": "2025-07-29T10:00:00Z",
-                    "supplier": "Sample Supplier 1",
-                    "amount": 1000000
-                },
-                {
-                    "id": 2, 
-                    "filename": "sample2.pdf",
-                    "processed_at": "2025-07-29T09:30:00Z",
-                    "supplier": "Sample Supplier 2",
-                    "amount": 2000000
-                }
-            ],
-            "total": 2,
-            "note": "This is mock data - database will be connected later"
-        },
-        "timestamp": str(datetime.utcnow())
-    })
+    """Legacy endpoint - redirect to faktur-history"""
+    return get_faktur_history()
 
 print("✅ All routes registered with CORS support")
 

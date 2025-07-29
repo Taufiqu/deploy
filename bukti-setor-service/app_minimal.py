@@ -1,5 +1,5 @@
 # ========================================
-# MINIMAL FLASK APP WITH CORS & API ENDPOINTS
+# MINIMAL BUKTI SETOR APP WITH CORS & API ENDPOINTS
 # ========================================
 
 import os
@@ -8,7 +8,7 @@ from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-print("🚀 STARTING MINIMAL FLASK APP WITH CORS...")
+print("🚀 STARTING MINIMAL BUKTI SETOR APP WITH CORS...")
 print(f"📊 Python version: {sys.version}")
 print(f"📊 PORT environment: {os.environ.get('PORT', 'NOT SET')}")
 
@@ -31,9 +31,9 @@ print("✅ Flask app with CORS created successfully")
 def home():
     print("📝 Home endpoint called")
     return jsonify({
-        "service": "faktur-minimal",
+        "service": "bukti-setor-minimal",
         "status": "running",
-        "message": "Deployment test successful!",
+        "message": "Bukti Setor deployment test successful!",
         "timestamp": str(datetime.utcnow())
     })
 
@@ -42,7 +42,7 @@ def health():
     print("🏥 Health endpoint called")
     return jsonify({
         "status": "healthy",
-        "service": "faktur-minimal", 
+        "service": "bukti-setor-minimal", 
         "version": "1.0.0"
     })
 
@@ -51,17 +51,17 @@ def test():
     print("🧪 Test endpoint called")
     return jsonify({
         "database": "not connected (test mode)",
-        "ocr": "disabled (test mode)",
+        "ocr": "disabled (test mode - will add EasyOCR later)",
         "environment": {
             "PORT": os.environ.get('PORT', 'not set'),
             "FLASK_ENV": os.environ.get('FLASK_ENV', 'not set')
         }
     })
 
-# API ENDPOINTS FOR FAKTUR PROCESSING
+# API ENDPOINTS FOR BUKTI SETOR PROCESSING
 @app.route('/api/process', methods=['POST', 'OPTIONS'])
-def process_invoice():
-    print("📄 Process invoice endpoint called")
+def process_receipt():
+    print("🧾 Process receipt endpoint called")
     
     # Handle preflight OPTIONS request
     if request.method == 'OPTIONS':
@@ -71,16 +71,16 @@ def process_invoice():
         # For now, return a mock response since we don't have OCR yet
         return jsonify({
             "status": "success",
-            "message": "Invoice processing endpoint working (OCR disabled in minimal mode)",
+            "message": "Receipt processing endpoint working (OCR disabled in minimal mode)",
             "data": {
                 "processed": True,
-                "ocr_engine": "tesseract (disabled)",
-                "filename": "test.pdf",
+                "ocr_engine": "easyocr (disabled)",
+                "filename": "test.jpg",
                 "extracted_data": {
-                    "supplier": "Test Supplier",
-                    "invoice_number": "INV-2025-001", 
-                    "amount": 1000000,
-                    "tax": 110000,
+                    "bank_name": "Bank Test",
+                    "account_number": "1234567890",
+                    "transaction_amount": 500000,
+                    "transaction_date": "2025-07-29",
                     "note": "This is a mock response - OCR will be added later"
                 }
             },
@@ -88,7 +88,7 @@ def process_invoice():
         }), 200
         
     except Exception as e:
-        print(f"❌ Error in process_invoice: {e}")
+        print(f"❌ Error in process_receipt: {e}")
         return jsonify({
             "status": "error",
             "message": f"Processing failed: {str(e)}"
@@ -101,20 +101,20 @@ def get_history():
         "status": "success",
         "message": "History endpoint working (database disabled in minimal mode)",
         "data": {
-            "invoices": [
+            "receipts": [
                 {
                     "id": 1,
-                    "filename": "sample1.pdf",
+                    "filename": "receipt1.jpg",
                     "processed_at": "2025-07-29T10:00:00Z",
-                    "supplier": "Sample Supplier 1",
-                    "amount": 1000000
+                    "bank_name": "Bank Test 1",
+                    "amount": 500000
                 },
                 {
-                    "id": 2, 
-                    "filename": "sample2.pdf",
+                    "id": 2,
+                    "filename": "receipt2.jpg", 
                     "processed_at": "2025-07-29T09:30:00Z",
-                    "supplier": "Sample Supplier 2",
-                    "amount": 2000000
+                    "bank_name": "Bank Test 2",
+                    "amount": 750000
                 }
             ],
             "total": 2,
@@ -125,8 +125,10 @@ def get_history():
 
 print("✅ All routes registered with CORS support")
 
+print("✅ All routes registered")
+
 if __name__ == '__main__':
     # Railway automatically sets PORT environment variable
-    port = int(os.environ.get('PORT', 5001))
+    port = int(os.environ.get('PORT', 5002))
     print(f"🚀 Starting app on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)

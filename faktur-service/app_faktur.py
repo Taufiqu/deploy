@@ -3,6 +3,7 @@
 # ========================================
 
 import os
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -39,13 +40,43 @@ db.init_app(app)
 # ========================================
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Health check endpoint for Railway"""
-    return jsonify({
-        "status": "healthy",
-        "service": "faktur-ocr",
-        "ocr_engine": "tesseract",
-        "version": "1.0.0"
-    }), 200
+    """Simple health check endpoint for Railway - no DB dependency"""
+    try:
+        return {
+            "status": "healthy",
+            "service": "faktur-ocr",
+            "ocr_engine": "tesseract",
+            "version": "1.0.0",
+            "timestamp": str(datetime.utcnow())
+        }, 200
+    except Exception as e:
+        return {
+            "status": "unhealthy", 
+            "error": str(e)
+        }, 500
+
+@app.route('/health/full', methods=['GET'])
+def health_check_full():
+    """Full health check with database"""
+    try:
+        # Test database connection
+        result = db.session.execute(db.text("SELECT 1"))
+        test_value = result.fetchone()[0]
+        
+        return jsonify({
+            "status": "healthy",
+            "service": "faktur-ocr",
+            "ocr_engine": "tesseract", 
+            "version": "1.0.0",
+            "database": "connected" if test_value == 1 else "error",
+            "timestamp": str(datetime.utcnow())
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "unhealthy",
+            "service": "faktur-ocr",
+            "error": str(e)
+        }), 500
 
 # ========================================
 # FAKTUR PROCESSING ENDPOINTS

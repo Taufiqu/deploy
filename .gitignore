@@ -507,3 +507,5 @@ coverage/
 
 # Yarn Integrity file
 .yarn-integrity
+
+api.js

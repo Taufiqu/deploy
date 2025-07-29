@@ -1,0 +1,51 @@
+# Build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+tests/
+
+# Documentation
+*.md
+!README.md
+
+# Backup files
+*.backup
+*.bak
+
+# Railway and deployment files (keep what we need)
+railway-bukti-setor.toml
+Dockerfile.*.backup
+Procfile*
+deploy_*.sh

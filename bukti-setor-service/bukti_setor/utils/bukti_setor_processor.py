@@ -5,11 +5,11 @@ import numpy as np
 import cv2
 from pdf2image import convert_from_path
 from flask import current_app
-from .ocr_engine import process_with_easyocr
+from .ocr_engine import process_with_ocr
 from .spellcheck import correct_spelling
 from shared_utils.text_utils import clean_transaction_value, fuzzy_month_match
 from shared_utils.file_utils import allowed_file, is_valid_image, is_image_file
-from shared_utils.image_utils import preprocess_for_easyocr
+from shared_utils.image_utils import preprocess_for_ocr
 from .helpers import simpan_preview_image
 from .parsing.tanggal import parse_tanggal
 from .parsing.jumlah import parse_jumlah
@@ -43,11 +43,11 @@ def _extract_data_from_image(pil_image, upload_folder, page_num=1, original_file
         ratio = MAX_WIDTH / img_cv.shape[1]
         img_cv = cv2.resize(img_cv, None, fx=ratio, fy=ratio, interpolation=cv2.INTER_AREA)
 
-    processed_img = preprocess_for_easyocr(img_cv)
+    processed_img = preprocess_for_ocr(img_cv)
     
-    # Get OCR results using lazy-loaded EasyOCR with error handling
+    # Get OCR results using universal OCR engine with error handling
     try:
-        ocr_results = process_with_easyocr(processed_img)
+        ocr_results = process_with_ocr(processed_img)
         
         if not ocr_results:
             current_app.logger.warning(f"[⚠️ PERINGATAN] Tidak ada hasil OCR untuk halaman {page_num}")
@@ -61,7 +61,7 @@ def _extract_data_from_image(pil_image, upload_folder, page_num=1, original_file
             
         # Debug EasyOCR input
         debug_text = " ".join([res[1] for res in ocr_results if len(res[1].strip()) >= 3])
-        print(f"[🤖 DEBUG OCR-EasyOCR Input] Halaman {page_num} ------------")
+        print(f"[🤖 DEBUG OCR Input] Halaman {page_num} ------------")
         print(debug_text[:500] + "..." if len(debug_text) > 500 else debug_text)
         print("--------------------------------------------")
 
@@ -108,7 +108,7 @@ def extract_bukti_setor_data(filepath, poppler_path):
     upload_folder = current_app.config['UPLOAD_FOLDER']
     print(f"📁 [DEBUG] Upload folder: {upload_folder}")
     
-    # OCR akan di-initialize secara lazy saat process_with_easyocr dipanggil
+    # OCR akan di-initialize secara lazy saat process_with_ocr dipanggil
     list_of_results = []
     filename_only = os.path.basename(filepath)
     total_pages = 1  # Default value

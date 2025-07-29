@@ -1,7 +1,7 @@
-# ULTRA MINIMAL - JUST FLASK
-Flask==2.3.3
-gunicorn==20.1.0
+# LOCAL TESTING WITH DATABASE
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
 Flask-CORS==4.0.0
-
-# Logging and monitoring
-structlog==23.2.0
+psycopg2-binary==2.9.7
+python-dotenv==1.0.0
+gunicorn==20.1.0

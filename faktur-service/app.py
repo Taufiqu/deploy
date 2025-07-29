@@ -42,7 +42,7 @@ app = Flask(__name__)
 
 # CORS Configuration
 CORS(app, 
-     origins=["*"],  # For Railway, allow all origins
+     origins=["*", "https://pajak-ocr.vercel.app", "http://localhost:3000"],  # Allow Vercel domain
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization", "Accept"],
      supports_credentials=False)
@@ -54,21 +54,25 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-secret-key')
 if DATABASE_AVAILABLE:
     database_url = os.getenv('DATABASE_URL')
     if database_url:
-        # Debug: log connection string format (without password)
-        debug_url = database_url.split('@')[0].split(':')[:-1] + ['****@'] + database_url.split('@')[1:]
-        logger.info(f"🔌 Connecting to: {''.join(debug_url) if len(debug_url) > 1 else 'Invalid URL format'}")
+        # Debug: log raw connection string format (hide password)
+        masked_url = database_url[:50] + "***" + database_url[-20:] if len(database_url) > 70 else database_url
+        logger.info(f"� Raw DATABASE_URL: {masked_url}")
         
-        # Convert postgresql:// to postgresql+pg8000:// for pg8000 driver
-        if database_url.startswith('postgresql://'):
-            database_url = database_url.replace('postgresql://', 'postgresql+pg8000://')
-        
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-            'pool_pre_ping': True,
-            'pool_recycle': 300,
-            'pool_timeout': 30,
-        }
+        # Debug: check if URL format is correct
+        if not database_url.startswith('postgresql://'):
+            logger.error(f"❌ Invalid DATABASE_URL format! Must start with 'postgresql://', got: {database_url[:20]}...")
+            DATABASE_AVAILABLE = False
+        else:
+            # Use standard postgresql:// for psycopg2
+            logger.info(f"🔄 Using psycopg2 driver")
+            
+            app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+            app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+            app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+                'pool_pre_ping': True,
+                'pool_recycle': 300,
+                'pool_timeout': 30,
+            }
         
         # Initialize database
         try:
@@ -328,6 +332,70 @@ def delete_faktur(faktur_id):
         return jsonify({
             "status": "error",
             "message": f"Error: {str(e)}"
+        }), 500
+
+@app.route('/api/process', methods=['POST', 'OPTIONS'])
+def process_upload():
+    """Process uploaded file - main endpoint for frontend"""
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        return jsonify({"status": "ok"}), 200
+    
+    try:
+        logger.info(f"📤 Processing upload request from: {request.origin}")
+        
+        # Check if database is available
+        if not DATABASE_AVAILABLE:
+            return jsonify({
+                "status": "error",
+                "message": "Database service temporarily unavailable",
+                "code": "DB_UNAVAILABLE"
+            }), 503
+        
+        # Check if file was uploaded
+        if 'file' not in request.files:
+            return jsonify({
+                "status": "error",
+                "message": "No file uploaded",
+                "code": "NO_FILE"
+            }), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({
+                "status": "error",
+                "message": "No file selected",
+                "code": "EMPTY_FILE"
+            }), 400
+        
+        # For now, return success with placeholder data
+        # TODO: Implement actual OCR processing with Tesseract
+        
+        placeholder_data = {
+            "jenis": "masukan",
+            "no_faktur": f"DEMO-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+            "tanggal": datetime.now().strftime('%Y-%m-%d'),
+            "nama_lawan_transaksi": "Demo Company",
+            "dpp": 1000000,
+            "ppn": 100000,
+            "filename": file.filename
+        }
+        
+        logger.info(f"📝 Demo processing completed for: {file.filename}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "File processed successfully (DEMO MODE)",
+            "data": placeholder_data,
+            "note": "This is demo mode. OCR processing will be implemented next."
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Process upload error: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": f"Processing failed: {str(e)}",
+            "code": "PROCESS_ERROR"
         }), 500
 
 # Error Handlers

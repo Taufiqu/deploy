@@ -1,5 +1,5 @@
 # =========================================================================
-# FAKTUR SERVICE - ULTRA MINIMAL FOR RAILWAY
+# FAKTUR SERVICE - WITH POSTGRESQL SUPPORT
 # =========================================================================
 FROM python:3.11-slim
 
@@ -8,10 +8,16 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
+# Install system dependencies for PostgreSQL
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy requirements first for better Docker caching
 COPY requirements.txt .
 
-# Install Python dependencies without system deps
+# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     rm -rf ~/.cache/pip

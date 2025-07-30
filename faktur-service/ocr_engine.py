@@ -3,6 +3,7 @@ OCR Engine untuk Faktur Processing - Railway Production
 """
 import os
 import re
+import io
 import cv2
 import numpy as np
 import pytesseract

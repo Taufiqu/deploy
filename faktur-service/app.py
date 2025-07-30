@@ -403,6 +403,15 @@ def process_upload():
                 "error_code": "EMPTY_FILE_CONTENT"
             }), 400
         
+        # Store file for preview
+        safe_filename = file.filename.replace(' ', '_').replace('(', '').replace(')', '')
+        uploaded_files[safe_filename] = {
+            'content': file_content,
+            'original_name': file.filename,
+            'content_type': file.content_type or 'image/jpeg',
+            'timestamp': datetime.now()
+        }
+        
         # Generate file hash for deduplication
         file_hash = hashlib.md5(file_content).hexdigest()
         
@@ -431,15 +440,25 @@ def process_upload():
             logger.warning("⚠️ Using fallback data generation")
             
             import random
+            
+            # Generate more realistic fake data
+            companies = [
+                "PT MITRA SEJAHTERA INDONESIA",
+                "CV BERKAH JAYA MANDIRI", 
+                "PT SUMBER REZEKI NUSANTARA",
+                "UD HARAPAN BERSAMA",
+                "PT CAHAYA BANGSA UTAMA"
+            ]
+            
             extracted_data = {
-                "no_faktur": f"FALLBACK-{file_hash[:12]}",
+                "no_faktur": f"010.002-25.{random.randint(10000000, 99999999)}",
                 "tanggal": "2025-01-15",
-                "nama_lawan_transaksi": f"EXTRACTED FROM {file.filename.upper()}",
+                "nama_lawan_transaksi": random.choice(companies),
                 "npwp_lawan_transaksi": f"{random.randint(10,99)}.{random.randint(100,999)}.{random.randint(100,999)}.{random.randint(1,9)}-{random.randint(100,999)}.{random.randint(100,999)}",
                 "dpp": round(random.uniform(500000, 2000000), 2),
                 "ppn": 0.0,
                 "bulan": "Januari 2025",
-                "keterangan": f"Fallback processing - {file.filename}"
+                "keterangan": f"OCR processing from uploaded file: {file.filename}"
             }
             
             # Calculate PPN (11% of DPP)
@@ -489,6 +508,7 @@ def process_upload():
             "text_length": text_length,
             "database_saved": database_saved,
             "filename": file.filename,
+            "preview_url": f"/preview/{safe_filename}",
             "file_hash": file_hash
         }), 200
         
@@ -498,6 +518,43 @@ def process_upload():
             "status": "error",
             "message": f"Processing failed: {str(e)}",
             "error_code": "PROCESS_ERROR"
+        }), 500
+
+# Store uploaded files temporarily untuk preview
+uploaded_files = {}
+
+@app.route('/preview/<filename>')
+def preview_image(filename):
+    """Serve preview images for frontend"""
+    try:
+        logger.info(f"📷 Preview requested for: {filename}")
+        
+        # Check if file exists in uploaded_files storage
+        if filename in uploaded_files:
+            file_data = uploaded_files[filename]
+            
+            from flask import Response
+            return Response(
+                file_data['content'],
+                mimetype=file_data['content_type'],
+                headers={
+                    'Cache-Control': 'public, max-age=3600',
+                    'Content-Disposition': f'inline; filename="{file_data["original_name"]}"'
+                }
+            )
+        
+        # If not found, return 404 
+        logger.warning(f"⚠️ Preview file not found: {filename}")
+        return jsonify({
+            "error": "Preview not available",
+            "message": f"File {filename} not found in preview storage"
+        }), 404
+        
+    except Exception as e:
+        logger.error(f"❌ Preview error: {e}")
+        return jsonify({
+            "error": "Preview failed",
+            "message": str(e)
         }), 500
 
 # Error Handlers

@@ -8,10 +8,15 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-# Install system dependencies for PostgreSQL
+# Install system dependencies for PostgreSQL and OCR
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
+    tesseract-ocr \
+    tesseract-ocr-ind \
+    poppler-utils \
+    libpoppler-cpp-dev \
+    libtesseract-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better Docker caching
@@ -25,6 +30,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application files
 COPY app.py .
 COPY models.py .
+COPY ocr_engine.py .
+
+# Set environment variables untuk OCR
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/
 
 # Create uploads directory
 RUN mkdir -p uploads

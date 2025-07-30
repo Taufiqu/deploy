@@ -417,7 +417,7 @@ def process_upload():
         
         logger.info(f"🔍 Processing file: {file.filename} (size: {len(file_content)} bytes)")
         
-        # Process with OCR engine if available
+        # Process with enhanced OCR engine if available
         extracted_data = None
         confidence = 0.0
         text_length = 0
@@ -425,13 +425,20 @@ def process_upload():
         
         if OCR_AVAILABLE:
             try:
-                logger.info(f"🔍 Starting real OCR processing...")
+                logger.info(f"🔍 Starting enhanced OCR processing...")
                 extracted_data, confidence, text_length = ocr_engine.process_file(file_content, file.filename)
-                processing_mode = "ocr"
-                logger.info(f"✅ OCR processing completed with confidence: {confidence}")
+                processing_mode = "enhanced_ocr"
+                logger.info(f"✅ Enhanced OCR processing completed with confidence: {confidence}")
+                
+                # Validate extracted data quality
+                if extracted_data and extracted_data.get("no_faktur") and confidence > 0.2:
+                    logger.info(f"🎯 High quality extraction achieved: {extracted_data['no_faktur']}")
+                else:
+                    logger.warning(f"⚠️ Low quality extraction (confidence: {confidence}), using fallback")
+                    extracted_data = None
                 
             except Exception as ocr_error:
-                logger.error(f"❌ OCR processing failed: {ocr_error}")
+                logger.error(f"❌ Enhanced OCR processing failed: {ocr_error}")
                 extracted_data = None
                 confidence = 0.1
         
